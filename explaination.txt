@@ -1,0 +1,10 @@
+0  = player
+8  = enemy
+_  = floor
+[] = exit
+
+inventory:
+HPO  = health potion
+HMP  = health multiplier
+ADMP = attack damage multiplier
+CMP  = critical hit chance multiplier
