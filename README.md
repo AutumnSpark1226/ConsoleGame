@@ -7,7 +7,7 @@ ConsoleGame is a dungeon game that can be played in a console.
 _  = floor  
 \[] = exit  
 
-inventory:
+inventory:  
 HPO  = health potion  
 HMP  = health multiplier  
 ADMP = attack damage multiplier  
