@@ -1,3 +1,4 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/autumnspark1226/consolegame/badge)](https://www.codefactor.io/repository/github/autumnspark1226/consolegame)
 # ConsoleGame
 ConsoleGame is a dungeon game that can be played in a console.
 # Explanantion
