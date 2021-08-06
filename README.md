@@ -19,7 +19,7 @@ If you use windows replace the "/" with "\\".
     git clone https://github.com/AutumnSpark1226/ConsoleGame.git  
 2. Look for the file {downloaded folder}/src/autumnspark1226/ConsoleGame.java  
 3. Go to the folder
-    cd {downloaded folder}/src/autumnspark1226/ConsoleGame.java  
+    cd {downloaded folder}/src/autumnspark1226  
 4. Compile the file  
     javac ConsoleGame.java  
 5. Execute the file
