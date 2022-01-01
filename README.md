@@ -1,7 +1,7 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/autumnspark1226/consolegame/badge)](https://www.codefactor.io/repository/github/autumnspark1226/consolegame)
 # ConsoleGame
 ConsoleGame is a dungeon game that can be played in a console.
-# Explanantion
+# Game
 
 0  = player  
 8  = enemy  
@@ -10,9 +10,9 @@ _  = floor
 
 inventory:  
 HPO  = health potion  
-HMP  = health multiplier  
-ADMP = attack damage multiplier  
-CMP  = critical hit chance multiplier  
+HD   = health double  
+ADP  = attack damage plus  
+CHP  = critical hit chance plus
 # Compile
 If you use windows replace the "/" with "\\".  
 1. Download the source code  
