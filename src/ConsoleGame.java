@@ -3,6 +3,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
+ * ConsoleGame is a dungeon game that can be played in a console.
  * @author AutumnSpark1226
  * @version 2022.1.1
  */
@@ -25,7 +26,6 @@ public class ConsoleGame {
     private static boolean enemyLocked = true;
     private static int enemyPos = 9;
     private static int enemyHp = 5;
-    private static int enemyLevel = 1;
     private static int enemyAttackDamage = 1;
     private static byte attackDamageCounter = 0;
     private static double enemyCritValue = 0.01;
@@ -105,22 +105,21 @@ public class ConsoleGame {
             inventory.add("HPO");
             inventory.add("HPO");
             inventory.add("HPO");
-            builder.append("You found three health potions\n");
+            builder.append("You found three health potions\n\n");
         } else if (Math.random() < 0.2 + (double) heroLevel / 15 && inventory.size() != 20) {
             inventory.add("HPO");
-            builder.append("You found a health potion\n");
+            builder.append("You found a health potion\n\n");
         }
         if(heroHp < heroLevel * 10){
            heroHp = heroLevel * 10;
         }
         heroPos = 0;
         enemyPos = 9;
-        enemyLevel++;
-        enemyHp = 5 * enemyLevel;
+        enemyHp = 5 * stage;
         enemyCritValue += 0.01;
-        enemyHPO = (int) (Math.random() * (enemyLevel - 2));
+        enemyHPO = (int) (Math.random() * (stage - 2));
         if (attackDamageCounter == 5) {
-            enemyAttackDamage = enemyLevel - 1;
+            enemyAttackDamage = stage - 1;
             attackDamageCounter = 0;
         } else {
             attackDamageCounter++;
@@ -143,7 +142,7 @@ public class ConsoleGame {
                   alive = false;
               }
             }else if (enemyHp <= heroAttackDamage && enemyHPO > 0 && heroHp > enemyAttackDamage) {
-                enemyHp += enemyLevel * 5;
+                enemyHp += stage * 5;
                 enemyHPO--;
             } else if ((enemyPos - heroPos == 1 || heroPos - enemyPos == 1)) {
                 if (Math.random() < enemyCritValue) {
@@ -212,56 +211,7 @@ public class ConsoleGame {
                 enemyHp -= heroAttackDamage;
             }
             if (enemyHp < 1) {
-                enemyLocked = true;
-                if (enemyHp < 0) {
-                    enemyHp = 0;
-                }
-                int droppedXp = (int) ((double) enemyLevel * 5 * (Math.random() + 1));
-                heroXp += droppedXp;
-                enemyPos = 9;
-                while (heroLevel < 10 && heroXp >= xpTable[heroLevel]) {
-                    heroLevel++;
-                    if(heroHp < heroLevel * 10){
-                       heroHp = heroLevel * 10;
-                    }
-                    heroAttackDamage++;
-                    builder.append("Level up!\n");
-                    heroCritValue += 0.01;
-                }
-                builder.append("Drops:\n");
-                builder.append("XP: ").append(droppedXp).append("\n");
-                if (Math.random() <= 0.46 + (double) heroLevel / 15) {
-                    if (inventory.size() != 20) {
-                        inventory.add("HPO");
-                        builder.append("Health potion\n");
-                    } else {
-                        builder.append("You inventory is full\n");
-                    }
-                }
-                if (Math.random() < 0.3 + (double) heroLevel / 50) {
-                    if (inventory.size() != 20) {
-                        inventory.add("HD");
-                        builder.append("Health double\n");
-                    } else {
-                        builder.append("You inventory is full\n");
-                    }
-                }
-                if (Math.random() < 0.1 + (double) heroLevel / 50) {
-                    if (inventory.size() != 20) {
-                        inventory.add("ADP");
-                        builder.append("Attack damage plus\n");
-                    } else {
-                        builder.append("You inventory is full\n");
-                    }
-                }
-                if (Math.random() < 0.05 + (double) heroLevel / 100) {
-                    if (inventory.size() != 20) {
-                        inventory.add("CHP");
-                        builder.append("Critical hit chance plus\n");
-                    } else {
-                        builder.append("You inventory is full\n");
-                    }
-                }
+                kill();
             }
             enemy();
         }
@@ -270,7 +220,7 @@ public class ConsoleGame {
     private static void heal() {
         if (inventory.contains("HPO")) {
             inventory.remove("HPO");
-            heroHp += (enemyLevel * 5 + heroLevel);
+            heroHp += (stage * 5 + heroLevel);
             enemy();
         } else {
             builder.append("You don't have any health potions!\n");
@@ -367,14 +317,18 @@ public class ConsoleGame {
             }
         } else if (item.equalsIgnoreCase("chp") || item.equalsIgnoreCase("critical hit chance plus")) { //TODO crit chance over 100%; alway double??
             if (inventory.contains("CHP")) {
-                if (heroCritValue * 2 <= 50) {
-                    heroCritValue *= 2;
-                } else {
-                    heroCritValue += 0.1;
+                if((heroCritValue + 0.1) > 1){
+                  heroCritValue = 1;
+                  output = "You make a critical hit every time. All critical hit chance plus removed.";
+                  while(inventory.contains("CHP")){
+                    inventory.remove("CHP");
+                  }
+                } else{
+                   heroCritValue += 0.1;
+                   inventory.remove("CHP");
+                   enemy();
+                   output = "Your critical hit chance is now " + ((int) (heroCritValue * 100.00)) + "%";
                 }
-                inventory.remove("CHP");
-                enemy();
-                output = "Your critical hit chance is now " + ((int) (heroCritValue * 100.00)) + "%";
             } else {
                 output = "You don't have any critical hit chance plus!";
             }
@@ -396,7 +350,7 @@ public class ConsoleGame {
                 .append(heroCritValue).append(";")
                 .append(enemyPos).append(";")
                 .append(enemyHp).append(";")
-                .append(enemyLevel).append(";")
+                .append(stage).append(";")
                 .append(enemyAttackDamage).append(";")
                 .append(attackDamageCounter).append(";")
                 .append(enemyCritValue).append(";")
@@ -419,7 +373,7 @@ public class ConsoleGame {
         heroCritValue = Double.parseDouble(values[7]);
         enemyPos = Integer.parseInt(values[8]);
         enemyHp = Integer.parseInt(values[9]);
-        enemyLevel = Integer.parseInt(values[10]);
+        stage = Integer.parseInt(values[10]);
         enemyAttackDamage = Integer.parseInt(values[11]);
         attackDamageCounter = Byte.parseByte(values[12]);
         enemyCritValue = Double.parseDouble(values[13]);
@@ -432,8 +386,62 @@ public class ConsoleGame {
         }
     }
 
-    public static void clearScreen(){
+    private  static void clearScreen(){
      System.out.print("\033[H\033[2J");
      System.out.flush();
    }
+
+    private static void kill(){
+      enemyLocked = true;
+      if (enemyHp < 0) {
+          enemyHp = 0;
+      }
+      int droppedXp = (int) ((double) stage * 5 * (Math.random() + 1));
+      heroXp += droppedXp;
+      enemyPos = 9;
+      while (heroLevel < 10 && heroXp >= xpTable[heroLevel]) {
+          heroLevel++;
+          if(heroHp < heroLevel * 10){
+             heroHp = heroLevel * 10;
+          }
+          heroAttackDamage++;
+          builder.append("Level up!\n");
+          heroCritValue += 0.01;
+      }
+      builder.append("Drops:\n");
+      builder.append("XP: ").append(droppedXp).append("\n");
+      if (Math.random() <= 0.46 + (double) heroLevel / 15) {
+          if (inventory.size() != 20) {
+              inventory.add("HPO");
+              builder.append("Health potion\n");
+          } else {
+              builder.append("You inventory is full\n");
+          }
+      }
+      if (Math.random() < 0.3 + (double) heroLevel / 50) {
+          if (inventory.size() != 20) {
+              inventory.add("HD");
+              builder.append("Health double\n");
+          } else {
+              builder.append("You inventory is full\n");
+          }
+      }
+      if (Math.random() < 0.1 + (double) heroLevel / 50) {
+          if (inventory.size() != 20) {
+              inventory.add("ADP");
+              builder.append("Attack damage plus\n");
+          } else {
+              builder.append("You inventory is full\n");
+          }
+      }
+      if (Math.random() < 0.05 + (double) heroLevel / 100) {
+          if (inventory.size() != 20) {
+              inventory.add("CHP");
+              builder.append("Critical hit chance plus\n");
+          } else {
+              builder.append("You inventory is full\n");
+          }
+      }
+      builder.append("\n");
+    }
 }
