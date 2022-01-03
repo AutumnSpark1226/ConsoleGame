@@ -287,55 +287,71 @@ public class ConsoleGame {
     private static String use(String item) {
         String output;
         if (item.equalsIgnoreCase("hpo") || item.equalsIgnoreCase("health potion")) {
-            if (inventory.contains("HPO")) {
-                heal();
-                output = "Your health is now " + heroHp;
-            } else {
-                output = "You don't have any health potions!";
-            }
+            output = useHPO();
         } else if (item.equalsIgnoreCase("hd") || item.equalsIgnoreCase("health double")) {
-            if (inventory.contains("HD")) {
-                heroHp *= 2;
-                inventory.remove("HD");
-                enemy();
-                output = "Your health is now " + heroHp;
-            } else {
-                output = "You don't have any health doubles!";
-            }
+            output = useHD();
         } else if (item.equalsIgnoreCase("adp") || item.equalsIgnoreCase("attack damage plus")) {
-            if (inventory.contains("ADP")) {
-                if (heroAttackDamage * 2 <= 16) {
-                    heroAttackDamage *= 2;
-                } else {
-                    heroAttackDamage+= heroLevel;
-                }
-                inventory.remove("ADP");
-                enemy();
-                output = "You attack damage is now " + heroAttackDamage;
-            } else {
-                output = "You don't have any attack damage plus!";
-            }
+            output = useADP();
         } else if (item.equalsIgnoreCase("chp") || item.equalsIgnoreCase("critical hit chance plus")) {
-            if (inventory.contains("CHP")) {
-                if((heroCritValue + 0.1) > 1){
-                  heroCritValue = 1;
-                  output = "You make a critical hit every time. All critical hit chance plus removed.";
-                  while(inventory.contains("CHP")){
-                    inventory.remove("CHP");
-                  }
-                } else{
-                   heroCritValue += 0.1;
-                   inventory.remove("CHP");
-                   enemy();
-                   output = "Your critical hit chance is now " + ((int) (heroCritValue * 100.00)) + "%";
-                }
-            } else {
-                output = "You don't have any critical hit chance plus!";
-            }
+            output = useCHP();
         } else {
             output = "Unknown item";
         }
         return output + "\n\n" + show();
+    }
+
+    private static String useHPO(){
+      if (inventory.contains("HPO")) {
+          heal();
+          return "Your health is now " + heroHp;
+      } else {
+          return "You don't have any health potions!";
+      }
+    }
+
+    private static String useHD(){
+      if (inventory.contains("HD")) {
+          heroHp *= 2;
+          inventory.remove("HD");
+          enemy();
+          output = "Your health is now " + heroHp;
+      } else {
+          output = "You don't have any health doubles!";
+      }
+    }
+
+    private static String useADP(){
+      if (inventory.contains("ADP")) {
+          if (heroAttackDamage * 2 <= 16) {
+              heroAttackDamage *= 2;
+          } else {
+              heroAttackDamage+= heroLevel;
+          }
+          inventory.remove("ADP");
+          enemy();
+          output = "You attack damage is now " + heroAttackDamage;
+      } else {
+          output = "You don't have any attack damage plus!";
+      }
+    }
+
+    private static String useCHP(){
+      if (inventory.contains("CHP")) {
+          if((heroCritValue + 0.1) > 1){
+            heroCritValue = 1;
+            output = "You make a critical hit every time. All critical hit chance plus removed.";
+            while(inventory.contains("CHP")){
+              inventory.remove("CHP");
+            }
+          } else{
+             heroCritValue += 0.1;
+             inventory.remove("CHP");
+             enemy();
+             output = "Your critical hit chance is now " + ((int) (heroCritValue * 100.00)) + "%";
+          }
+      } else {
+          output = "You don't have any critical hit chance plus!";
+      }
     }
 
     public static String getSaveState() {
