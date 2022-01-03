@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * ConsoleGame is a dungeon game that can be played in a console.
  * @author AutumnSpark1226
- * @version 2022.1.3
+ * @version 2022.1.3-hotfix
  */
 
 public class ConsoleGame {
