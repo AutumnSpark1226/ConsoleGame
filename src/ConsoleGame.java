@@ -141,28 +141,25 @@ public class ConsoleGame {
             } else if ((heroPos - enemyPos) != 1 && (heroPos - enemyPos) > 0) {
                 enemyPos++;
             } else if(heroHp <= enemyAttackDamage){
-              if (Math.random() < enemyCritValue) {
-                  heroHp -= enemyAttackDamage * 2;
-              } else {
-                  heroHp -= enemyAttackDamage;
-              }
-              if (heroHp < 1) {
-                  alive = false;
-              }
-            }else if (enemyHp <= heroAttackDamage && enemyHPO > 0 && heroHp > enemyAttackDamage) {
+                enemyAttack();
+            } else if (enemyHp <= heroAttackDamage && enemyHPO > 0 && heroHp > enemyAttackDamage) {
                 enemyHp += stage * 5;
                 enemyHPO--;
-            } else if ((enemyPos - heroPos == 1 || heroPos - enemyPos == 1)) {
-                if (Math.random() < enemyCritValue) {
-                    heroHp -= enemyAttackDamage * 2;
-                } else {
-                    heroHp -= enemyAttackDamage;
-                }
-                if (heroHp < 1) {
-                    alive = false;
-                }
+            } else {
+                enemyAttack();
             }
         }
+    }
+
+    private static void enemyAttack(){
+      if (Math.random() < enemyCritValue) {
+          heroHp -= enemyAttackDamage * 2;
+      } else {
+          heroHp -= enemyAttackDamage;
+      }
+      if (heroHp < 1) {
+          alive = false;
+      }
     }
 
     private static String show() {
