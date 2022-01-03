@@ -1,3 +1,4 @@
+[![Java test](https://github.com/AutumnSpark1226/ConsoleGame/actions/workflows/java.yml/badge.svg)](https://github.com/AutumnSpark1226/ConsoleGame/actions/workflows/java.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/autumnspark1226/consolegame/badge)](https://www.codefactor.io/repository/github/autumnspark1226/consolegame)
 # ConsoleGame
 ConsoleGame is a dungeon game that can be played in a console.
