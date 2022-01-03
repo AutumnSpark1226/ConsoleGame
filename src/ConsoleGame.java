@@ -315,7 +315,7 @@ public class ConsoleGame {
             } else {
                 output = "You don't have any attack damage plus!";
             }
-        } else if (item.equalsIgnoreCase("chp") || item.equalsIgnoreCase("critical hit chance plus")) { //TODO crit chance over 100%; alway double??
+        } else if (item.equalsIgnoreCase("chp") || item.equalsIgnoreCase("critical hit chance plus")) {
             if (inventory.contains("CHP")) {
                 if((heroCritValue + 0.1) > 1){
                   heroCritValue = 1;
