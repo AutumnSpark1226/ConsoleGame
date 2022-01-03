@@ -320,9 +320,9 @@ public class ConsoleGame {
           heroHp *= 2;
           inventory.remove("HD");
           enemy();
-          output = "Your health is now " + heroHp;
+          return "Your health is now " + heroHp;
       } else {
-          output = "You don't have any health doubles!";
+          return "You don't have any health doubles!";
       }
     }
 
@@ -335,9 +335,9 @@ public class ConsoleGame {
           }
           inventory.remove("ADP");
           enemy();
-          output = "You attack damage is now " + heroAttackDamage;
+          return "You attack damage is now " + heroAttackDamage;
       } else {
-          output = "You don't have any attack damage plus!";
+          return "You don't have any attack damage plus!";
       }
     }
 
@@ -345,18 +345,18 @@ public class ConsoleGame {
       if (inventory.contains("CHP")) {
           if((heroCritValue + 0.1) > 1){
             heroCritValue = 1;
-            output = "You make a critical hit every time. All critical hit chance plus removed.";
             while(inventory.contains("CHP")){
               inventory.remove("CHP");
             }
+            return "You make a critical hit every time. All critical hit chance plus removed.";
           } else{
              heroCritValue += 0.1;
              inventory.remove("CHP");
              enemy();
-             output = "Your critical hit chance is now " + ((int) (heroCritValue * 100.00)) + "%";
+             return "Your critical hit chance is now " + ((int) (heroCritValue * 100.00)) + "%";
           }
       } else {
-          output = "You don't have any critical hit chance plus!";
+          return "You don't have any critical hit chance plus!";
       }
     }
 
