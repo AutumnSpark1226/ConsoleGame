@@ -5,15 +5,18 @@ import java.util.ArrayList;
 /**
  * ConsoleGame is a dungeon game that can be played in a console.
  * @author AutumnSpark1226
- * @version 2022.1.1
+ * @version 2022.1.3
  */
 
 public class ConsoleGame {
+    // required to work
     private static BufferedReader br;
-    private static int stage = 1;
     private static StringBuilder builder = new StringBuilder();
+    // game data
+    // general
+    private static int stage = 1;
     private static Boolean alive = true;
-    //hero
+    // hero
     private static int heroPos = 0;
     private static int heroHp = 10;
     private static int heroXp = 0;
@@ -22,7 +25,7 @@ public class ConsoleGame {
     public static final int[] xpTable = {0, 10, 30, 50, 100, 200, 500, 750, 1000, 1500};
     private static final ArrayList<String> inventory = new ArrayList<>(20);
     private static double heroCritValue = 0.01;
-    //enemy
+    // enemy
     private static boolean enemyLocked = true;
     private static int enemyPos = 9;
     private static int enemyHp = 5;
@@ -125,6 +128,11 @@ public class ConsoleGame {
             attackDamageCounter++;
         }
     }
+
+    private  static void clearScreen(){
+     System.out.print("\033[H\033[2J");
+     System.out.flush();
+   }
 
     private static void enemy() {
         if (enemyHp > 0 && !enemyLocked) {
@@ -284,6 +292,7 @@ public class ConsoleGame {
         return output + "\n\n" + show();
     }
 
+    // use items
     private static String use(String item) {
         String output;
         if (item.equalsIgnoreCase("hpo") || item.equalsIgnoreCase("health potion")) {
@@ -401,11 +410,6 @@ public class ConsoleGame {
             }
         }
     }
-
-    private  static void clearScreen(){
-     System.out.print("\033[H\033[2J");
-     System.out.flush();
-   }
 
     private static void kill(){
       enemyLocked = true;
