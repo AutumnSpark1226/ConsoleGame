@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * ConsoleGame is a dungeon game that can be played in a console.
  * @author AutumnSpark1226
- * @version 2022.1.3-hotfix
+ * @version 2022.1.6
  */
 
 public class ConsoleGame {
@@ -57,6 +57,7 @@ public class ConsoleGame {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    System.out.println(show());
                 } else {
                     System.out.println(game(input));
                 }
@@ -142,7 +143,7 @@ public class ConsoleGame {
                 enemyPos++;
             } else if(heroHp <= enemyAttackDamage){
                 enemyAttack();
-            } else if (enemyHp <= heroAttackDamage && enemyHPO > 0 && heroHp > enemyAttackDamage) {
+            } else if (enemyHp <= heroAttackDamage && enemyHPO > 0) {
                 enemyHp += stage * 5;
                 enemyHPO--;
             } else {
@@ -167,22 +168,16 @@ public class ConsoleGame {
             return "Game over!\nStage: " + stage + "\nLevel: " + heroLevel;
         }
         builder.append("HP:").append(heroHp).append("___E:").append(enemyHp).append('\n');
-        for (int i = 0; i < (heroPos); i++) {
-            builder.append('_');
-        }
+        builder.append("_".repeat(Math.max(0, (heroPos))));
         builder.append('0');
-        for (int i = 0; i < (enemyPos - heroPos - 1); i++) {
-            builder.append('_');
-        }
+        builder.append("_".repeat(Math.max(0, (enemyPos - heroPos - 1))));
         if (enemyHp > 0) {
             builder.append('8');
         } else if (heroPos != 9) {
             builder.append('_');
         }
         if (heroPos < enemyPos) {
-            for (int i = 0; i < (9 - enemyPos); i++) {
-                builder.append('_');
-            }
+            builder.append("_".repeat(Math.max(0, (9 - enemyPos))));
         }
         builder.append("[]");
         String output = builder.toString();
@@ -402,7 +397,7 @@ public class ConsoleGame {
         enemyHPO = Integer.parseInt(values[14]);
         inventory.clear();
         for (int i = 14; i < values.length; i++) {
-            if (values[i].equals("HPO") || values[i].equals("HMP") || values[i].equals("ADMP") || values[i].equals("CMP")) {
+            if (values[i].equals("HPO") || values[i].equals("HD") || values[i].equals("ADP") || values[i].equals("CHP")) {
                 inventory.add(values[i]);
             }
         }
