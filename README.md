@@ -27,4 +27,16 @@ CHP  = critical hit chance plus
    - java ConsoleGame
 
 # How to play
-WIP
+Enter the command and press enter  
+Commands are:  
+- d or right (go right)
+- a or left (go left)
+- w or weapon (use your weapon and attack the enemy)
+- s or heal (use a health potion to heal your injuries)
+- i or inventory (look at your inventory)
+- t or stats (look at your stats)
+- u or use <item name or short form> (use this item)
+- show (print the game)
+- exit (close the game)
+- getsavestate (print a string that contains the current game)
+- loadsavestate <savestate> (load a Savestate)
