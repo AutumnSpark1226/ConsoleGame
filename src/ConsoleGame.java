@@ -4,8 +4,9 @@ import java.util.ArrayList;
 
 /**
  * ConsoleGame is a dungeon game that can be played in a console.
+ *
  * @author AutumnSpark1226
- * @version 2022.1.6
+ * @version 2022.1.20
  */
 
 public class ConsoleGame {
@@ -22,8 +23,8 @@ public class ConsoleGame {
     private static int heroXp = 0;
     private static int heroLevel = 1;
     private static int heroAttackDamage = 1;
-    public static final int[] xpTable = {0, 10, 30, 50, 100, 200, 500, 750, 1000, 1500};
-    private static final ArrayList<String> inventory = new ArrayList<>(20);
+    public static final int[] xpTable = {0, 10, 30, 50, 100, 200, 500, 750, 1000, 1500, 2000, 3000, 5000, 7500, 10000, 15000, 20000, 30000, 50000, 100000};
+    private static final ArrayList<String> inventory = new ArrayList<>(50);
     private static double heroCritValue = 0.01;
     // enemy
     private static boolean enemyLocked = true;
@@ -37,7 +38,7 @@ public class ConsoleGame {
     public static void main(String[] args) {
         clearScreen();
         try {
-            br = new BufferedReader(new InputStreamReader(System.in)); // TODO input without enter
+            br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println(game("show"));
         } catch (Exception e) {
             e.printStackTrace();
@@ -52,11 +53,7 @@ public class ConsoleGame {
                 } else if (input.equalsIgnoreCase("getSaveState")) {
                     System.out.println(getSaveState());
                 } else if (input.startsWith("loadsavestate ")) {
-                    try {
-                        loadSaveState(input.replace("loadsavestate ", ""));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    loadSaveState(input.replace("loadsavestate ", ""));
                     System.out.println(show());
                 } else {
                     System.out.println(game(input));
@@ -110,7 +107,7 @@ public class ConsoleGame {
             inventory.add("HPO");
             inventory.add("HPO");
             builder.append("You found three health potions\n\n");
-        } else if (Math.random() < 0.2 + (double) heroLevel / 15 && inventory.size() != 20) {
+        } else if (Math.random() < 0.2 + ((double) heroLevel) / 15 && inventory.size() != 50) {
             inventory.add("HPO");
             builder.append("You found a health potion\n\n");
         }
@@ -219,9 +216,13 @@ public class ConsoleGame {
 
     private static void heal() {
         if (inventory.contains("HPO")) {
-            inventory.remove("HPO");
-            heroHp += (stage * 5 + heroLevel);
-            enemy();
+            if(heroHp < (heroLevel * 10)) {
+                inventory.remove("HPO");
+                heroHp = heroLevel * 10;
+                enemy();
+            }else{
+                builder.append("You don't need to heal yourself!\n");
+            }
         } else {
             builder.append("You don't have any health potions!\n");
         }
@@ -367,7 +368,6 @@ public class ConsoleGame {
                 .append(heroCritValue).append(";")
                 .append(enemyPos).append(";")
                 .append(enemyHp).append(";")
-                .append(stage).append(";")
                 .append(enemyAttackDamage).append(";")
                 .append(attackDamageCounter).append(";")
                 .append(enemyCritValue).append(";")
@@ -379,27 +379,46 @@ public class ConsoleGame {
     }
 
     public static void loadSaveState(String saveState) {
-        String[] values = saveState.replace("CG", "").split(";");
-        stage = Integer.parseInt(values[0]);
-        alive = Boolean.valueOf(values[1]);
-        heroPos = Integer.parseInt(values[2]);
-        heroHp = Integer.parseInt(values[3]);
-        heroXp = Integer.parseInt(values[4]);
-        heroLevel = Integer.parseInt(values[5]);
-        heroAttackDamage = Integer.parseInt(values[6]);
-        heroCritValue = Double.parseDouble(values[7]);
-        enemyPos = Integer.parseInt(values[8]);
-        enemyHp = Integer.parseInt(values[9]);
-        stage = Integer.parseInt(values[10]);
-        enemyAttackDamage = Integer.parseInt(values[11]);
-        attackDamageCounter = Byte.parseByte(values[12]);
-        enemyCritValue = Double.parseDouble(values[13]);
-        enemyHPO = Integer.parseInt(values[14]);
-        inventory.clear();
-        for (int i = 14; i < values.length; i++) {
-            if (values[i].equals("HPO") || values[i].equals("HD") || values[i].equals("ADP") || values[i].equals("CHP")) {
-                inventory.add(values[i]);
+        try {
+            String[] values = saveState.replace("CG", "").split(";");
+            stage = Integer.parseInt(values[0]);
+            alive = Boolean.valueOf(values[1]);
+            heroPos = Integer.parseInt(values[2]);
+            heroHp = Integer.parseInt(values[3]);
+            heroXp = Integer.parseInt(values[4]);
+            heroLevel = Integer.parseInt(values[5]);
+            heroAttackDamage = Integer.parseInt(values[6]);
+            heroCritValue = Double.parseDouble(values[7]);
+            enemyPos = Integer.parseInt(values[8]);
+            enemyHp = Integer.parseInt(values[9]);
+            enemyAttackDamage = Integer.parseInt(values[10]);
+            attackDamageCounter = Byte.parseByte(values[11]);
+            enemyCritValue = Double.parseDouble(values[12]);
+            enemyHPO = Integer.parseInt(values[13]);
+            inventory.clear();
+            for (int i = 14; i < values.length; i++) {
+                if (values[i].equals("HPO") || values[i].equals("HD") || values[i].equals("ADP") || values[i].equals("CHP")) {
+                    inventory.add(values[i]);
+                }
             }
+        } catch (Exception e) {
+            builder.append("Error loading savestate\n");
+            stage = 1;
+            alive = true;
+            heroPos = 0;
+            heroHp = 10;
+            heroXp = 0;
+            heroLevel = 1;
+            heroAttackDamage = 1;
+            inventory.clear();
+            heroCritValue = 0.01;
+            enemyLocked = true;
+            enemyPos = 9;
+            enemyHp = 5;
+            enemyAttackDamage = 1;
+            attackDamageCounter = 0;
+            enemyCritValue = 0.01;
+            enemyHPO = 0;
         }
     }
 
@@ -411,43 +430,43 @@ public class ConsoleGame {
       int droppedXp = (int) ((double) stage * 5 * (Math.random() + 1));
       heroXp += droppedXp;
       enemyPos = 9;
-      while (heroLevel < 10 && heroXp >= xpTable[heroLevel]) {
-          heroLevel++;
-          if(heroHp < heroLevel * 10){
-             heroHp = heroLevel * 10;
-          }
-          heroAttackDamage++;
-          builder.append("Level up!\n");
-          heroCritValue += 0.01;
-      }
+        while (heroLevel < xpTable.length && heroXp >= xpTable[heroLevel]) {
+            heroLevel++;
+            if (heroHp < heroLevel * 10) {
+                heroHp = heroLevel * 10;
+            }
+            heroAttackDamage++;
+            builder.append("Level up!\n");
+            heroCritValue += 0.01;
+        }
       builder.append("Drops:\n");
       builder.append("XP: ").append(droppedXp).append("\n");
-      if (Math.random() <= 0.46 + (double) heroLevel / 15) {
-          if (inventory.size() != 20) {
+      if (Math.random() <= 0.46 + ((double) heroLevel) / 15) {
+          if (inventory.size() != 50) {
               inventory.add("HPO");
               builder.append("Health potion\n");
           } else {
               builder.append("You inventory is full\n");
           }
       }
-      if (Math.random() < 0.3 + (double) heroLevel / 50) {
-          if (inventory.size() != 20) {
+      if (Math.random() < ((double) heroLevel) / 50) {
+          if (inventory.size() != 50) {
               inventory.add("HD");
               builder.append("Health double\n");
           } else {
               builder.append("You inventory is full\n");
           }
       }
-      if (Math.random() < 0.1 + (double) heroLevel / 50) {
-          if (inventory.size() != 20) {
+      if (Math.random() < 0.1 + ((double) heroLevel / 50)) {
+          if (inventory.size() != 50) {
               inventory.add("ADP");
               builder.append("Attack damage plus\n");
           } else {
               builder.append("You inventory is full\n");
           }
       }
-      if (Math.random() < 0.05 + (double) heroLevel / 100) {
-          if (inventory.size() != 20) {
+      if (Math.random() < 0.05 + ((double) heroLevel / 100)) {
+          if (inventory.size() != 50) {
               inventory.add("CHP");
               builder.append("Critical hit chance plus\n");
           } else {
