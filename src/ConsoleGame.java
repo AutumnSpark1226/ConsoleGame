@@ -10,6 +10,9 @@ import java.util.ArrayList;
  */
 
 public class ConsoleGame {
+    // final
+    public static final int[] xpTable = {0, 10, 30, 50, 100, 200, 500, 750, 1000, 1500, 2000, 3000, 5000, 7500, 10000, 15000, 20000, 30000, 50000, 100000};
+    private static final ArrayList<String> inventory = new ArrayList<>(50);
     // required to work
     private static BufferedReader br;
     private static StringBuilder builder = new StringBuilder();
@@ -23,8 +26,6 @@ public class ConsoleGame {
     private static int heroXp = 0;
     private static int heroLevel = 1;
     private static int heroAttackDamage = 1;
-    public static final int[] xpTable = {0, 10, 30, 50, 100, 200, 500, 750, 1000, 1500, 2000, 3000, 5000, 7500, 10000, 15000, 20000, 30000, 50000, 100000};
-    private static final ArrayList<String> inventory = new ArrayList<>(50);
     private static double heroAccuracy = 1;
     // enemy
     private static boolean enemyLocked = true;
@@ -66,9 +67,9 @@ public class ConsoleGame {
 
     public static String game(String input) {
         String output;
-        if(!alive || heroHp <= 0){
-          alive = false;
-          return "You are dead";
+        if (!alive || heroHp <= 0) {
+            alive = false;
+            return "You are dead";
         }
         if (input.equalsIgnoreCase("show")) {
             output = show();
@@ -78,18 +79,16 @@ public class ConsoleGame {
         } else if (input.equalsIgnoreCase("a") || input.equalsIgnoreCase("left")) {
             left();
             output = show();
-        } else if (input.equalsIgnoreCase("w") || input.equalsIgnoreCase("weapon")) {
-            weapon();
+        } else if (input.equalsIgnoreCase("w") || input.equalsIgnoreCase("attack")) {
+            attack();
             output = show();
         } else if (input.equalsIgnoreCase("s") || input.equalsIgnoreCase("heal")) {
             heal();
             output = show();
         } else if (input.equalsIgnoreCase("i") || input.equalsIgnoreCase("inventory")) {
             output = showInventory();
-            builder = new StringBuilder();
         } else if (input.equalsIgnoreCase("t") || input.equalsIgnoreCase("stats")) {
             output = stats();
-            builder = new StringBuilder();
         } else if (input.startsWith("u") || input.startsWith("use")) {
             output = use(input.replace("use ", "").replace("u ", ""));
         } else if (input.startsWith("del ") || input.startsWith("delete ")) {
@@ -97,11 +96,12 @@ public class ConsoleGame {
         } else {
             output = "Unknown command";
         }
+        builder = new StringBuilder();
         return output;
     }
 
     private static void generateNextStage() {
-      enemyLocked = true;
+        enemyLocked = true;
         stage++;
         builder.append("Stage: ").append(stage).append("\n");
         if (stage == 2) {
@@ -123,7 +123,7 @@ public class ConsoleGame {
         enemyHPO = (int) (Math.random() * (stage - 2));
         if (heroAttackDamage > (enemyAttackDamage * 2)) {
             enemyAttackDamage = stage * 2;
-        } else if (attackDamageCounter == 5) {
+        } else if (attackDamageCounter == 3) {
             enemyAttackDamage = stage - 1;
             attackDamageCounter = 0;
         } else {
@@ -131,10 +131,10 @@ public class ConsoleGame {
         }
     }
 
-    private  static void clearScreen(){
-     System.out.print("\033[H\033[2J");
-     System.out.flush();
-   }
+    private static void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
 
     private static void enemy() {
         if (enemyHp > 0 && !enemyLocked) {
@@ -142,7 +142,7 @@ public class ConsoleGame {
                 enemyPos--;
             } else if ((heroPos - enemyPos) != 1 && (heroPos - enemyPos) > 0) {
                 enemyPos++;
-            } else if(heroHp <= enemyAttackDamage){
+            } else if (heroHp <= enemyAttackDamage) {
                 enemyAttack();
             } else if (enemyHp <= heroAttackDamage && enemyHPO > 0) {
                 if (enemyHp < (stage * 5)) {
@@ -155,11 +155,11 @@ public class ConsoleGame {
         }
     }
 
-    private static void enemyAttack(){
+    private static void enemyAttack() {
         heroHp -= (int) ((double) enemyAttackDamage * enemyAccuracy * (Math.random() + 1));
-      if (heroHp < 1) {
-          alive = false;
-      }
+        if (heroHp < 1) {
+            alive = false;
+        }
     }
 
     private static String show() {
@@ -202,7 +202,7 @@ public class ConsoleGame {
         enemy();
     }
 
-    private static void weapon() {
+    private static void attack() {
         if ((enemyPos - heroPos == 1 || heroPos - enemyPos == 1) && enemyHp > 0) {
             enemyHp -= (int) ((double) heroAttackDamage * heroAccuracy * (Math.random() + 1));
             if (enemyHp < 1) {
@@ -216,7 +216,11 @@ public class ConsoleGame {
         if (inventory.contains("HPO")) {
             if (heroHp < (stage * 5)) {
                 inventory.remove("HPO");
-                heroHp = stage * 5;
+                if(stage > heroLevel) {
+                    heroHp = stage * 5;
+                } else{
+                    heroHp = heroLevel * 10;
+                }
                 enemy();
             } else {
                 builder.append("You don't need to heal yourself!\n\n");
@@ -301,41 +305,37 @@ public class ConsoleGame {
         return output + show();
     }
 
-    private static String useHD(){
-      if (inventory.contains("HD")) {
-          heroHp *= 2;
-          inventory.remove("HD");
-          enemy();
-          return "Your health is now " + heroHp;
-      } else {
-          return "You don't have any health doubles!";
-      }
+    private static String useHD() {
+        if (inventory.contains("HD")) {
+            heroHp *= 2;
+            inventory.remove("HD");
+            enemy();
+            return "Your health is now " + heroHp;
+        } else {
+            return "You don't have any health doubles!";
+        }
     }
 
-    private static String useADP(){
-      if (inventory.contains("ADP")) {
-          if (heroAttackDamage * 2 <= 16) {
-              heroAttackDamage *= 2;
-          } else {
-              heroAttackDamage += heroLevel;
-          }
-          inventory.remove("ADP");
-          enemy();
-          return "You attack damage is now " + heroAttackDamage;
-      } else {
-          return "You don't have any attack damage plus!";
-      }
+    private static String useADP() {
+        if (inventory.contains("ADP")) {
+            heroAttackDamage += heroLevel;
+            inventory.remove("ADP");
+            enemy();
+            return "You attack damage is now " + heroAttackDamage;
+        } else {
+            return "You don't have any attack damage plus!";
+        }
     }
 
-    private static String useAP(){
-      if (inventory.contains("AC")) {
-          heroAccuracy += 0.1;
-          inventory.remove("AC");
-          enemy();
-          return "Your accuracy is now " + heroAccuracy;
-      } else {
-          return "You don't have any accuracy plus!";
-      }
+    private static String useAP() {
+        if (inventory.contains("AC")) {
+            heroAccuracy += 0.1;
+            inventory.remove("AC");
+            enemy();
+            return "Your accuracy is now " + heroAccuracy;
+        } else {
+            return "You don't have any accuracy plus!";
+        }
     }
 
     public static String getSaveState() {
