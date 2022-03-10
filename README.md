@@ -27,7 +27,7 @@ AC   = accuracy plus
    - java ConsoleGame
 
 # How to play
-Enter the command and press enter  
+Type a command and press enter  
 Commands are:  
 - d or right (go right)
 - a or left (go left)
