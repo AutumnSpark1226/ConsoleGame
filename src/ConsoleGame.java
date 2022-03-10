@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * ConsoleGame is a dungeon game that can be played in a console.
  *
  * @author AutumnSpark1226
- * @version 2022.1.20
+ * @version 2022.3.8
  */
 
 public class ConsoleGame {
@@ -25,14 +25,14 @@ public class ConsoleGame {
     private static int heroAttackDamage = 1;
     public static final int[] xpTable = {0, 10, 30, 50, 100, 200, 500, 750, 1000, 1500, 2000, 3000, 5000, 7500, 10000, 15000, 20000, 30000, 50000, 100000};
     private static final ArrayList<String> inventory = new ArrayList<>(50);
-    private static double heroCritValue = 0.01;
+    private static double heroAccuracy = 1;
     // enemy
     private static boolean enemyLocked = true;
     private static int enemyPos = 9;
     private static int enemyHp = 5;
     private static int enemyAttackDamage = 1;
     private static byte attackDamageCounter = 0;
-    private static double enemyCritValue = 0.01;
+    private static double enemyAccuracy = 1;
     private static int enemyHPO = 0;
 
     public static void main(String[] args) {
@@ -92,6 +92,8 @@ public class ConsoleGame {
             builder = new StringBuilder();
         } else if (input.startsWith("u") || input.startsWith("use")) {
             output = use(input.replace("use ", "").replace("u ", ""));
+        } else if (input.startsWith("del ") || input.startsWith("delete ")) {
+            output = delete(input.replace("del ", "").replace("delete ", ""));
         } else {
             output = "Unknown command";
         }
@@ -111,15 +113,17 @@ public class ConsoleGame {
             inventory.add("HPO");
             builder.append("You found a health potion\n\n");
         }
-        if(heroHp < heroLevel * 10){
-           heroHp = heroLevel * 10;
+        if (heroHp < heroLevel * 10) {
+            heroHp = heroLevel * 10;
         }
         heroPos = 0;
         enemyPos = 9;
         enemyHp = 5 * stage;
-        enemyCritValue += 0.01;
+        enemyAccuracy += 0.01;
         enemyHPO = (int) (Math.random() * (stage - 2));
-        if (attackDamageCounter == 5) {
+        if (heroAttackDamage > (enemyAttackDamage * 2)) {
+            enemyAttackDamage = stage * 2;
+        } else if (attackDamageCounter == 5) {
             enemyAttackDamage = stage - 1;
             attackDamageCounter = 0;
         } else {
@@ -141,7 +145,9 @@ public class ConsoleGame {
             } else if(heroHp <= enemyAttackDamage){
                 enemyAttack();
             } else if (enemyHp <= heroAttackDamage && enemyHPO > 0) {
-                enemyHp += stage * 5;
+                if (enemyHp < (stage * 5)) {
+                    enemyHp = stage * 5;
+                }
                 enemyHPO--;
             } else {
                 enemyAttack();
@@ -150,11 +156,7 @@ public class ConsoleGame {
     }
 
     private static void enemyAttack(){
-      if (Math.random() < enemyCritValue) {
-          heroHp -= enemyAttackDamage * 2;
-      } else {
-          heroHp -= enemyAttackDamage;
-      }
+        heroHp -= (int) ((double) enemyAttackDamage * enemyAccuracy * (Math.random() + 1));
       if (heroHp < 1) {
           alive = false;
       }
@@ -202,11 +204,7 @@ public class ConsoleGame {
 
     private static void weapon() {
         if ((enemyPos - heroPos == 1 || heroPos - enemyPos == 1) && enemyHp > 0) {
-            if (Math.random() < heroCritValue) {
-                enemyHp -= heroAttackDamage * 2;
-            } else {
-                enemyHp -= heroAttackDamage;
-            }
+            enemyHp -= (int) ((double) heroAttackDamage * heroAccuracy * (Math.random() + 1));
             if (enemyHp < 1) {
                 kill();
             }
@@ -216,15 +214,15 @@ public class ConsoleGame {
 
     private static void heal() {
         if (inventory.contains("HPO")) {
-            if(heroHp < (heroLevel * 10)) {
+            if (heroHp < (stage * 5)) {
                 inventory.remove("HPO");
-                heroHp = heroLevel * 10;
+                heroHp = stage * 5;
                 enemy();
-            }else{
-                builder.append("You don't need to heal yourself!\n");
+            } else {
+                builder.append("You don't need to heal yourself!\n\n");
             }
         } else {
-            builder.append("You don't have any health potions!\n");
+            builder.append("You don't have any health potions!\n\n");
         }
     }
 
@@ -245,11 +243,11 @@ public class ConsoleGame {
                 if (s.equals("ADP")) {
                     adp++;
                 }
-                if (s.equals("CHP")) {
+                if (s.equals("AC")) {
                     chp++;
                 }
             }
-            builder.append(" [").append(inventory.size()).append("/20]");
+            builder.append(" [").append(inventory.size()).append("/50]");
             if (hpo > 0) {
                 builder.append("\nHealth potion(s)[HPO]: ").append(hpo);
             }
@@ -260,7 +258,7 @@ public class ConsoleGame {
                 builder.append("\nAttack damage plus[ADP]: ").append(adp);
             }
             if (chp > 0) {
-                builder.append("\nCritical hit chance plus[CHP]: ").append(chp);
+                builder.append("\nCritical hit chance plus[AC]: ").append(chp);
             }
         } else {
             return "Your inventory is empty\n\n" + show();
@@ -275,11 +273,11 @@ public class ConsoleGame {
         builder.append("Level: ").append(heroLevel);
         builder.append("\nStage: ").append(stage);
         builder.append("\nXP: ").append(heroXp);
-        if (heroLevel < 10) {
+        if (heroLevel < xpTable.length) {
             builder.append("\nXP to next: ").append(xpTable[heroLevel] - heroXp);
         }
         builder.append("\nAttack damage: ").append(heroAttackDamage);
-        builder.append("\nCritical hit chance: ").append((int) (heroCritValue * 100)).append("%");
+        builder.append("\nAccuracy: ").append(heroAccuracy);
         String output = builder.toString();
         builder = new StringBuilder();
         return output + "\n\n" + show();
@@ -289,26 +287,18 @@ public class ConsoleGame {
     private static String use(String item) {
         String output;
         if (item.equalsIgnoreCase("hpo") || item.equalsIgnoreCase("health potion")) {
-            output = useHPO();
+            heal();
+            output = "";
         } else if (item.equalsIgnoreCase("hd") || item.equalsIgnoreCase("health double")) {
-            output = useHD();
+            output = useHD() + "\n\n";
         } else if (item.equalsIgnoreCase("adp") || item.equalsIgnoreCase("attack damage plus")) {
-            output = useADP();
-        } else if (item.equalsIgnoreCase("chp") || item.equalsIgnoreCase("critical hit chance plus")) {
-            output = useCHP();
+            output = useADP() + "\n\n";
+        } else if (item.equalsIgnoreCase("ac") || item.equalsIgnoreCase("accuracy plus")) {
+            output = useAP() + "\n\n";
         } else {
-            output = "Unknown item";
+            output = "Unknown item\n\n";
         }
-        return output + "\n\n" + show();
-    }
-
-    private static String useHPO(){
-      if (inventory.contains("HPO")) {
-          heal();
-          return "Your health is now " + heroHp;
-      } else {
-          return "You don't have any health potions!";
-      }
+        return output + show();
     }
 
     private static String useHD(){
@@ -327,7 +317,7 @@ public class ConsoleGame {
           if (heroAttackDamage * 2 <= 16) {
               heroAttackDamage *= 2;
           } else {
-              heroAttackDamage+= heroLevel;
+              heroAttackDamage += heroLevel;
           }
           inventory.remove("ADP");
           enemy();
@@ -337,22 +327,14 @@ public class ConsoleGame {
       }
     }
 
-    private static String useCHP(){
-      if (inventory.contains("CHP")) {
-          if((heroCritValue + 0.1) > 1){
-            heroCritValue = 1;
-            while(inventory.contains("CHP")){
-              inventory.remove("CHP");
-            }
-            return "You make a critical hit every time. All critical hit chance plus removed.";
-          } else{
-             heroCritValue += 0.1;
-             inventory.remove("CHP");
-             enemy();
-             return "Your critical hit chance is now " + ((int) (heroCritValue * 100.00)) + "%";
-          }
+    private static String useAP(){
+      if (inventory.contains("AC")) {
+          heroAccuracy += 0.1;
+          inventory.remove("AC");
+          enemy();
+          return "Your accuracy is now " + heroAccuracy;
       } else {
-          return "You don't have any critical hit chance plus!";
+          return "You don't have any accuracy plus!";
       }
     }
 
@@ -365,12 +347,12 @@ public class ConsoleGame {
                 .append(heroXp).append(";")
                 .append(heroLevel).append(";")
                 .append(heroAttackDamage).append(";")
-                .append(heroCritValue).append(";")
+                .append(heroAccuracy).append(";")
                 .append(enemyPos).append(";")
                 .append(enemyHp).append(";")
                 .append(enemyAttackDamage).append(";")
                 .append(attackDamageCounter).append(";")
-                .append(enemyCritValue).append(";")
+                .append(enemyAccuracy).append(";")
                 .append(enemyHPO).append(";");
         for (String s : inventory) {
             stringBuilder.append(s).append(";");
@@ -388,16 +370,16 @@ public class ConsoleGame {
             heroXp = Integer.parseInt(values[4]);
             heroLevel = Integer.parseInt(values[5]);
             heroAttackDamage = Integer.parseInt(values[6]);
-            heroCritValue = Double.parseDouble(values[7]);
+            heroAccuracy = Double.parseDouble(values[7]);
             enemyPos = Integer.parseInt(values[8]);
             enemyHp = Integer.parseInt(values[9]);
             enemyAttackDamage = Integer.parseInt(values[10]);
             attackDamageCounter = Byte.parseByte(values[11]);
-            enemyCritValue = Double.parseDouble(values[12]);
+            enemyAccuracy = Double.parseDouble(values[12]);
             enemyHPO = Integer.parseInt(values[13]);
             inventory.clear();
             for (int i = 14; i < values.length; i++) {
-                if (values[i].equals("HPO") || values[i].equals("HD") || values[i].equals("ADP") || values[i].equals("CHP")) {
+                if (values[i].equals("HPO") || values[i].equals("HD") || values[i].equals("ADP") || values[i].equals("AC")) {
                     inventory.add(values[i]);
                 }
             }
@@ -411,25 +393,25 @@ public class ConsoleGame {
             heroLevel = 1;
             heroAttackDamage = 1;
             inventory.clear();
-            heroCritValue = 0.01;
+            heroAccuracy = 0.01;
             enemyLocked = true;
             enemyPos = 9;
             enemyHp = 5;
             enemyAttackDamage = 1;
             attackDamageCounter = 0;
-            enemyCritValue = 0.01;
+            enemyAccuracy = 0.01;
             enemyHPO = 0;
         }
     }
 
-    private static void kill(){
-      enemyLocked = true;
-      if (enemyHp < 0) {
-          enemyHp = 0;
-      }
-      int droppedXp = (int) ((double) stage * 5 * (Math.random() + 1));
-      heroXp += droppedXp;
-      enemyPos = 9;
+    private static void kill() {
+        enemyLocked = true;
+        if (enemyHp < 0) {
+            enemyHp = 0;
+        }
+        int droppedXp = (int) ((double) stage * 5 * (Math.random() + 1));
+        heroXp += droppedXp;
+        enemyPos = 9;
         while (heroLevel < xpTable.length && heroXp >= xpTable[heroLevel]) {
             heroLevel++;
             if (heroHp < heroLevel * 10) {
@@ -437,42 +419,76 @@ public class ConsoleGame {
             }
             heroAttackDamage++;
             builder.append("Level up!\n");
-            heroCritValue += 0.01;
+            heroAccuracy += 0.01;
         }
-      builder.append("Drops:\n");
-      builder.append("XP: ").append(droppedXp).append("\n");
-      if (Math.random() <= 0.46 + ((double) heroLevel) / 15) {
-          if (inventory.size() != 50) {
-              inventory.add("HPO");
-              builder.append("Health potion\n");
-          } else {
-              builder.append("You inventory is full\n");
-          }
-      }
-      if (Math.random() < ((double) heroLevel) / 50) {
-          if (inventory.size() != 50) {
-              inventory.add("HD");
-              builder.append("Health double\n");
-          } else {
-              builder.append("You inventory is full\n");
-          }
-      }
-      if (Math.random() < 0.1 + ((double) heroLevel / 50)) {
-          if (inventory.size() != 50) {
-              inventory.add("ADP");
-              builder.append("Attack damage plus\n");
-          } else {
-              builder.append("You inventory is full\n");
-          }
-      }
-      if (Math.random() < 0.05 + ((double) heroLevel / 100)) {
-          if (inventory.size() != 50) {
-              inventory.add("CHP");
-              builder.append("Critical hit chance plus\n");
-          } else {
-              builder.append("You inventory is full\n");
-          }
-      }
-      builder.append("\n");
+        builder.append("Drops:\n");
+        builder.append("XP: ").append(droppedXp).append("\n");
+        if (Math.random() < 0.46 + ((double) heroLevel) / 15) {
+            if (inventory.size() != 50) {
+                inventory.add("HPO");
+                builder.append("Health potion\n");
+            } else {
+                builder.append("You inventory is full\n");
+            }
+        }
+        if (Math.random() < 0.05 + ((double) heroLevel) / 80) {
+            if (inventory.size() != 50) {
+                inventory.add("HD");
+                builder.append("Health double\n");
+            } else {
+                builder.append("You inventory is full\n");
+            }
+        }
+        if (Math.random() < 0.1 + ((double) heroLevel / 50)) {
+            if (inventory.size() != 50) {
+                inventory.add("ADP");
+                builder.append("Attack damage plus\n");
+            } else {
+                builder.append("You inventory is full\n");
+            }
+        }
+        if (Math.random() < 0.05 + ((double) heroLevel / 50)) {
+            if (inventory.size() != 50) {
+                inventory.add("AC");
+                builder.append("Accuracy plus\n");
+            } else {
+                builder.append("You inventory is full\n");
+            }
+        }
+        builder.append("\n");
+    }
+
+    private static String delete(String item) {
+        String output;
+        if (item.equalsIgnoreCase("hpo") || item.equalsIgnoreCase("health potion")) {
+            if (inventory.remove("HPO")) {
+                output = "You deleted a health potion";
+            } else {
+                output = "You don't have any health potions";
+            }
+        } else if (item.equalsIgnoreCase("hd") || item.equalsIgnoreCase("health double")) {
+            if (inventory.remove("HD")) {
+                output = "You deleted a health double";
+            } else {
+                output = "You don't have any health doubles";
+            }
+        } else if (item.equalsIgnoreCase("adp") || item.equalsIgnoreCase("attack damage plus")) {
+            if (inventory.remove("ADP")) {
+                output = "You deleted an attack damage plus";
+            } else {
+                output = "You don't have any attack damage plus";
+            }
+        } else if (item.equalsIgnoreCase("chp") || item.equalsIgnoreCase("critical hit chance plus")) {
+            if (inventory.remove("CHP")) {
+                output = "You deleted a critical hit chance plus";
+            } else {
+                output = "You don't have any critical hit chance plus";
+            }
+        } else {
+            output = "Unknown item";
+        }
+        return output + "\n\n" + show();
     }
 }
+
+//CG120;true;0;4580;52521;19;176;2.39;9;600;114;5;2.199999999999997;41;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;HPO;

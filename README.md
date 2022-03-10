@@ -36,6 +36,7 @@ Commands are:
 - i or inventory (look at your inventory)
 - t or stats (look at your stats)
 - u or use \<item name or short form> (use this item)
+- del or delete \<item name or short form> (delete an item from your inventory)
 - show (print the game)
 - exit (close the game)
 - getsavestate (print a string that contains the current game)
