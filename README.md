@@ -4,16 +4,16 @@
 ConsoleGame is a dungeon game that can be played in a console.
 # Game
 
-0  = player  
-8  = enemy  
-_  = floor  
+0   = player  
+8   = enemy  
+_   = floor  
 \[] = exit  
 
 inventory:  
 HPO  = health potion  
 HD   = health double  
 ADP  = attack damage plus  
-CHP  = critical hit chance plus
+AC   = accuracy plus
 # Compile  
 1. Download the source code  
    - gh repo clone AutumnSpark1226/ConsoleGame  
