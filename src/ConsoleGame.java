@@ -121,11 +121,8 @@ public class ConsoleGame {
         enemyHp = 5 * stage;
         enemyAccuracy += 0.01;
         enemyHPO = (int) (Math.random() * (stage - 2));
-        if (heroAttackDamage > (enemyAttackDamage * 2)) {
-            enemyAttackDamage = stage * 2;
-        } else if (attackDamageCounter == 3) {
-            enemyAttackDamage = stage - 1;
-            attackDamageCounter = 0;
+        if (attackDamageCounter == 3) {
+            enemyAttackDamage = stage * 2 - 1;
         } else {
             attackDamageCounter++;
         }
@@ -142,12 +139,10 @@ public class ConsoleGame {
                 enemyPos--;
             } else if ((heroPos - enemyPos) != 1 && (heroPos - enemyPos) > 0) {
                 enemyPos++;
-            } else if (heroHp <= enemyAttackDamage) {
+            } else if (heroHp <= enemyAttackDamage * enemyAccuracy) {
                 enemyAttack();
-            } else if (enemyHp <= heroAttackDamage && enemyHPO > 0) {
-                if (enemyHp < (stage * 5)) {
-                    enemyHp = stage * 5;
-                }
+            } else if (enemyHp <= heroAttackDamage * heroAccuracy && enemyHPO > 0 && enemyHp < (stage * 5)) {
+                enemyHp = stage * 5;
                 enemyHPO--;
             } else {
                 enemyAttack();
@@ -216,11 +211,7 @@ public class ConsoleGame {
         if (inventory.contains("HPO")) {
             if (heroHp < (stage * 5)) {
                 inventory.remove("HPO");
-                if(stage > heroLevel) {
-                    heroHp = stage * 5;
-                } else{
-                    heroHp = heroLevel * 10;
-                }
+                heroHp = Math.max((stage * 5), (heroLevel * 10));
                 enemy();
             } else {
                 builder.append("You don't need to heal yourself!\n\n");
@@ -423,7 +414,7 @@ public class ConsoleGame {
         }
         builder.append("Drops:\n");
         builder.append("XP: ").append(droppedXp).append("\n");
-        if (Math.random() < 0.46 + ((double) heroLevel) / 15) {
+        if (Math.random() < 0.46 + ((double) heroLevel) / 20) {
             if (inventory.size() != 50) {
                 inventory.add("HPO");
                 builder.append("Health potion\n");
@@ -431,7 +422,7 @@ public class ConsoleGame {
                 builder.append("You inventory is full\n");
             }
         }
-        if (Math.random() < 0.05 + ((double) heroLevel) / 80) {
+        if (Math.random() < 0.05) {
             if (inventory.size() != 50) {
                 inventory.add("HD");
                 builder.append("Health double\n");
@@ -439,7 +430,7 @@ public class ConsoleGame {
                 builder.append("You inventory is full\n");
             }
         }
-        if (Math.random() < 0.1 + ((double) heroLevel / 50)) {
+        if (Math.random() < 0.1 + ((double) heroLevel / 60)) {
             if (inventory.size() != 50) {
                 inventory.add("ADP");
                 builder.append("Attack damage plus\n");
