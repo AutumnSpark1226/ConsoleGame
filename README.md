@@ -13,7 +13,7 @@ inventory:
 HPO  = health potion  
 HD   = health double  
 ADP  = attack damage plus  
-AC   = accuracy plus
+AP   = accuracy plus
 # Compile  
 1. Download the source code  
    - gh repo clone AutumnSpark1226/ConsoleGame  

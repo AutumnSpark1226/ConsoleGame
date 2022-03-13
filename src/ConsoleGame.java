@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * ConsoleGame is a dungeon game that can be played in a console.
  *
  * @author AutumnSpark1226
- * @version 2022.3.8
+ * @version 2022.3.13
  */
 
 public class ConsoleGame {
@@ -247,7 +247,7 @@ public class ConsoleGame {
                 if (s.equals("ADP")) {
                     adp++;
                 }
-                if (s.equals("AC")) {
+                if (s.equals("AP")) {
                     chp++;
                 }
             }
@@ -262,7 +262,7 @@ public class ConsoleGame {
                 builder.append("\nAttack damage plus[ADP]: ").append(adp);
             }
             if (chp > 0) {
-                builder.append("\nCritical hit chance plus[AC]: ").append(chp);
+                builder.append("\nCritical hit chance plus[AP]: ").append(chp);
             }
         } else {
             return "Your inventory is empty\n\n" + show();
@@ -297,7 +297,7 @@ public class ConsoleGame {
             output = useHD() + "\n\n";
         } else if (item.equalsIgnoreCase("adp") || item.equalsIgnoreCase("attack damage plus")) {
             output = useADP() + "\n\n";
-        } else if (item.equalsIgnoreCase("ac") || item.equalsIgnoreCase("accuracy plus")) {
+        } else if (item.equalsIgnoreCase("ap") || item.equalsIgnoreCase("accuracy plus")) {
             output = useAP() + "\n\n";
         } else {
             output = "Unknown item\n\n";
@@ -328,9 +328,9 @@ public class ConsoleGame {
     }
 
     private static String useAP() {
-        if (inventory.contains("AC")) {
+        if (inventory.contains("AP")) {
             heroAccuracy += 0.1;
-            inventory.remove("AC");
+            inventory.remove("AP");
             enemy();
             return "Your accuracy is now " + heroAccuracy;
         } else {
@@ -379,7 +379,7 @@ public class ConsoleGame {
             enemyHPO = Integer.parseInt(values[13]);
             inventory.clear();
             for (int i = 14; i < values.length; i++) {
-                if (values[i].equals("HPO") || values[i].equals("HD") || values[i].equals("ADP") || values[i].equals("AC")) {
+                if (values[i].equals("HPO") || values[i].equals("HD") || values[i].equals("ADP") || values[i].equals("AP")) {
                     inventory.add(values[i]);
                 }
             }
@@ -449,7 +449,7 @@ public class ConsoleGame {
         }
         if (Math.random() < 0.05 + ((double) heroLevel / 50)) {
             if (inventory.size() != 50) {
-                inventory.add("AC");
+                inventory.add("AP");
                 builder.append("Accuracy plus\n");
             } else {
                 builder.append("You inventory is full\n");
@@ -478,11 +478,11 @@ public class ConsoleGame {
             } else {
                 output = "You don't have any attack damage plus";
             }
-        } else if (item.equalsIgnoreCase("chp") || item.equalsIgnoreCase("critical hit chance plus")) {
-            if (inventory.remove("CHP")) {
-                output = "You deleted a critical hit chance plus";
+        } else if (item.equalsIgnoreCase("ap") || item.equalsIgnoreCase("accuracy plus")) {
+            if (inventory.remove("AP")) {
+                output = "You deleted an accuracy plus";
             } else {
-                output = "You don't have any critical hit chance plus";
+                output = "You don't have any accuracy plus";
             }
         } else {
             output = "Unknown item";
